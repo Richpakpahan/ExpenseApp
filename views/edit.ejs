@@ -1,0 +1,138 @@
+<html>
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script >
+        const socket= io.connect('http://localhost:3000/');
+
+        function edit(i){
+            
+        }
+
+        function deleteID(i){
+            socket.emit('deleted', {
+                id:i
+            });
+            location.reload(true);
+        }
+        </script>
+
+<head>
+    <title></title>
+    <link href="css/bulma.min.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="container">
+        <div class="hero-head">
+            <nav class="navbar">
+                <div class="container">
+                    <div class="navbar-brand">
+                        <a class="navbar-item">
+                            <img src="https://bulma.io/images/bulma-type-white.png" alt="Logo">
+                        </a>
+                        <span class="navbar-burger burger" data-target="navbarMenuHeroA">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </span>
+                    </div>
+                    <div id="navbarMenuHeroA" class="navbar-menu">
+                        <div class="navbar-end">
+                            <a class="navbar-item is-active" href="http://localhost:3000/">
+                                Home
+                            </a>
+                            <a class="navbar-item" href="http://localhost:3000/addExpense">
+                                Add Expense
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="notification">
+            <div class="container">
+                <div class="notification">
+                    <div class="field">
+                        <label class="label">Category</label>
+                        <div class="select is-rounded">
+                            <select id="category">
+                              <option>-</option>
+                              <option>Grocery</option>
+                              <option>Eating Out</option>
+                              <option>Entertainment</option>
+                              <option>Clothes</option>
+                              <option>Gift</option>
+                              <option>Social</option>
+                            </select>
+                          </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Amount</label>
+                        <div class="control">
+                            <input class="input" type="text" placeholder="Amount" name="amount" id="amount">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Notes</label>
+                        <div class="control">
+                            <textarea class="textarea" placeholder="Notes" name="notes" id="notes"></textarea>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <p class="control">
+                            <button class="button is-success" name="tombol" id="tombol">
+                                Submit Expens
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            const socket = io.connect('http://localhost:3000/');
+            const sendButton = $('#tombol');
+            const amountInput = $('#amount');
+            const notesInput = $('#notes');
+            const categoryInput = $('#category');
+            
+            sendButton.click(() => {
+                event.preventDefault();
+                const amount = amountInput.val();
+                const notes = notesInput.val();
+                const category = categoryInput.val();
+                socket.emit('new_message', {
+                    amount: amount,
+                    notes: notes,
+                    category: category
+                });
+                location.reload(true);
+            });
+
+            
+
+            socket.on('get_data', (data) => {
+                let totalAmount = 0;
+                for (let i = 0; i < data.length; i++){
+                    $("#isi_tabel").append($('<tr>'))
+                    .append($('<th>').text(i + 1)).append($('</th>'))
+                    .append($(`<td  id ='keyid${i}'>`).text(data[i]._id)).append($('</td>'))
+                    .append($('<td>').text(data[i].notes)).append($('</td>'))
+                    .append($('<td>').text(data[i].category)).append($('</td>'))
+                    .append($('<td>').text("Rp."+data[i].amount)).append($('</td>'))
+                    .append($('<td>').append($(`<button id ="${i}" onclick="edit('${data[i]._id}');">`).text('Edit')).append($('</button>'))).append($('</td>'))
+                    .append($('<td>').append($(`<button id ="${i}" onclick="deleteID('${data[i]._id}');">`).text('Delete')).append($('</button>'))).append($('</td>'));
+                    totalAmount = parseInt(data[i].amount)+totalAmount;
+                }
+                $("#total").append("Rp."+totalAmount);
+            });
+
+            
+        });
+    </script>
+</body>
+
+</html>
